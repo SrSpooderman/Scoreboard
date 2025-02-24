@@ -2,6 +2,11 @@ package proyect;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello, World!");
+        ScoreServer ss = new ScoreServer();
+
+        Thread t = new Thread(ss);
+        t.start();
+
+        ScoreClient scoreClient = new ScoreClient();
     }
 }
