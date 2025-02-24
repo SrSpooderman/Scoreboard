@@ -2,11 +2,9 @@ package proyect;
 
 import javax.swing.*;
 import java.awt.event.*;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
+import java.util.Base64;
 
 public class ScoreClient extends JFrame implements ActionListener {
     private static final int PORT = 1234;
@@ -107,10 +105,18 @@ public class ScoreClient extends JFrame implements ActionListener {
 
     private void sendScore(){
         try {
-            String message = "score " + jtfName.getText()+":"+jtfScore.getText();
-            out.println(message);
+            ScoreInfo si = new ScoreInfo(jtfName.getText(), Integer.parseInt(jtfScore.getText()));
+
+            // Serializar el objeto ScoreInfo
+            ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteStream);
+            objectOutputStream.writeObject(si);
+
+            // Enviar el objeto serializado codificado en Base64
+            String encodedData = Base64.getEncoder().encodeToString(byteStream.toByteArray());
+            out.println("score " + encodedData);
             out.flush();
-        }catch (Exception e){
+        } catch (Exception e){
             jtaMesgs.append("Error enviando high score\n");
             System.out.println("Error en sendHighScore: " + e.getMessage());
         }

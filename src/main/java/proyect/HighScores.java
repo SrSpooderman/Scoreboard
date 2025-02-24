@@ -13,25 +13,17 @@ public class HighScores {
     }
 
     public void saveScore() {
-        try (PrintWriter writer = new PrintWriter(new FileWriter("src/main/resources/highscores.txt", true))){
+        try (PrintWriter writer = new PrintWriter(new FileWriter("src/main/resources/highscores.txt"))) {
             for (ScoreInfo scoreInfo : highScores) {
-                writer.println(scoreInfo.getName()+":"+scoreInfo.getScore());
+                writer.println(scoreInfo.getName() + ":" + scoreInfo.getScore());
             }
-        }catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("Error guardando los puntajes: " + e.getMessage());
         }
     }
 
-    public void addScore(String score) {
-        try{
-            String[] parts = score.split(":");
-            String name = parts[0].trim();
-            int scoreInt = Integer.parseInt(parts[1].trim());
-
-            highScores.add(new ScoreInfo(name,scoreInt));
-        } catch (NumberFormatException e) {
-            throw new RuntimeException(e);
-        }
+    public void addScore(ScoreInfo score) {
+        highScores.add(score);
     }
 
     private void loadScores(){
@@ -40,7 +32,7 @@ public class HighScores {
         try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/highscores.txt"))) {
             String line;
             while ((line = reader.readLine()) != null){
-                addScore(line);
+                addScore(new ScoreInfo(line));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

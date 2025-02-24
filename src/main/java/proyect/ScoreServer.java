@@ -1,11 +1,9 @@
 package proyect;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Base64;
 
 public class ScoreServer implements Runnable {
     private final HighScores highScores;
@@ -72,7 +70,24 @@ public class ScoreServer implements Runnable {
             out.println(highScores.toString());
         } else if ((line.length() >= 6) && (line.substring(0,5).toLowerCase().equals("score"))) {
             System.out.println("Processing 'score'");
-            highScores.addScore(line.substring(5).trim());
+
+            try {
+                // Extraer la cadena Base64
+                String encodedData = line.substring(6).trim();
+
+                // Decodificar desde Base64
+                byte[] data = Base64.getDecoder().decode(encodedData);
+
+                // Deserializar el objeto ScoreInfo
+                ByteArrayInputStream byteStream = new ByteArrayInputStream(data);
+                ObjectInputStream objectInputStream = new ObjectInputStream(byteStream);
+                ScoreInfo si = (ScoreInfo) objectInputStream.readObject();
+
+                // Añadir el puntaje a la lista
+                highScores.addScore(si);
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException("Error deserializando el puntaje", e);
+            }
         } else {
             System.out.println("Invalid request, ignoring request");
         }
